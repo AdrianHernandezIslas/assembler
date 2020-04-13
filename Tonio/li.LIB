@@ -1,0 +1,109 @@
+.CODE
+    MOV AX,@DATA
+    MOV DS,DX
+ 
+LEECAD MACRO buffer
+    MOV AH,0AH
+    LEA DX,buffer
+    INT 21H
+
+ENDM  
+   
+ESCRIBE MACRO letrero
+      
+      MOV AH,09H
+      LEA DX, letrero
+      INT 21H
+
+ENDM
+
+ESCRIBECHAR MACRO char
+     MOV AH,02H
+     MOV DL, char
+     INT 21H
+
+ENDM
+
+CLEAR MACRO inicio,fin
+     MOV AX,0600H
+     MOV BH,17H
+     MOV CX,inicio
+     MOV DX,fin
+     INT 10H
+ENDM
+
+CLEARCOLOR MACRO inicio,fin
+     MOV AX,0600H
+     MOV BH,30H
+     MOV CX,inicio
+     MOV DX,fin
+     INT 10H
+ENDM
+
+RETCOLOR MACRO inicio,fin
+     MOV AX,0600H
+     MOV BH,17H
+     MOV CX,inicio
+     MOV DX,fin
+     INT 10H
+ENDM
+
+
+POSICION MACRO coordy,coordx
+       MOV AH,02H
+       MOV DH,coordy
+       MOV DL,coordx
+       MOV BH,00H
+       INT 10H
+ENDM
+
+POSICOLOR MACRO reng,col
+       MOV AH,02H
+       MOV DH,reng
+       MOV DL,col
+       MOV BH,01H
+       INT 10H
+ENDM
+
+READ PROC
+       MOV AH,01H
+       INT 21H
+       RET
+READ ENDP
+
+LLENACAD MACRO buffer,tam
+
+     MOV AH,3FH
+     MOV BX,0 ;dispositivo desde donde lo vamos a leer
+     MOV CX,tam  ;maximo de caracteres a leer
+     LEA DX, buffer
+     INT 21H
+ENDM 
+
+RELLENACAD MACRO cad,tam
+      local lee,otra
+      MOV SI,0
+lee:  call READ
+      CMP AL, 0DH
+      JBE otra
+      MOV cad[SI], AL
+      INC SI
+      JMP lee
+otra: MOV tam,SI
+      MOV SI,0
+
+ENDM
+
+SETMOUSE MACRO
+    MOV AX,01H
+    INT 33H 
+    MOV AX,03H
+    INT 33H
+ENDM
+
+DIVNUM MACRO numero,divisor,destino
+     MOV AX,numero
+     MOV BL,divisor
+     DIV BL
+     MOV destino, AL
+ENDM

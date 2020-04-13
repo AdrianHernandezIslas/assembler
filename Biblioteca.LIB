@@ -1,0 +1,27 @@
+.CODE
+    MOV AX,@DATA
+    MOV DS,AX
+
+ESCRIBE MACRO letrero
+      
+      MOV AH,09H
+      LEA DX, letrero
+      INT 21H
+
+ENDM
+
+LIMPIA MACRO
+	  MOV AX,0600H
+	  MOV BH,17H
+	  MOV CX,0000
+	  MOV DX,184FH
+	  INT 10H 
+ENDM
+
+ADRIAN MACRO fila,col
+	  MOV AH,02H
+	  MOV DH,fila
+	  MOV DL,col
+	  MOV BH,00H
+	  INT 10H
+ENDM

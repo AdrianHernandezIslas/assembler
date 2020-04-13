@@ -1,0 +1,17 @@
+.CODE
+    MOV AX,@DATA
+    MOV DS,DX
+   
+ESCRIBE MACRO letrero
+      
+      MOV AH,09H
+      LEA DX, letrero
+      INT 21H
+
+ENDM
+
+READ PROC
+       MOV AH,01H
+       INT 21H
+       RET
+READ ENDP

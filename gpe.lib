@@ -1,0 +1,116 @@
+codigo SEGMENT 'CODE'
+      ASSUME ss:pila, ds: datos,cs:codigo 
+
+
+       limpia PROC
+           MOV AX,0600H
+	    MOV BH,17H;color
+	    MOV CX,0000H;fila
+           MOV DX,184FH;columna
+           INT 10H
+           ret   
+       limpia endp
+
+       pideValor PROC
+              MOV AH,01H
+              INT 21H
+              SUB AL,30H
+              ret
+       pideValor endp
+
+       mueve macro fila,columna
+              MOV AH,02H
+              MOV DH,fila;fila
+              MOV DL,columna;columna
+              MOV BH,00H
+              INT 10H
+       endm
+
+       imprime macro mensaje
+              local mensaje
+              mov AH,09H
+              lea DX,mensaje
+              INT 21H      
+       endm
+
+       imprimeYX macro fila,columna,letrero
+              mueve fila,columna
+              imprime letrero
+       endm
+
+       SHOWMOUSE MACRO
+              MOV AX,01H;puede ser tambien en AX
+              INT 33H
+       ENDM
+
+       CLICKEDMOUSE MACRO
+              MOV AX,03H
+              INT 33H;dESPUES DE ESTA MACRO EL RESULTADO ESTA EN BX, SI ES UNO ES IZQUIERDO
+       ENDM
+
+       INPUTCH PROC
+              MOV AH,01H
+              INT 21H;lo que lee esta en AL
+              RET
+       INPUTCH ENDP
+
+       OUTPUTCH MACRO var
+              MOV AH,02H ; funcion para imprimir un caracter
+              MOV DL,var ; mover un 64 a Dx para imprimir en pantalla
+              INT 21H ; ejecuta la funcion
+       ENDM
+
+       LLENAARRAY MACRO buffer,longitud ;esto rellena un arreglo y dice su tope = cunatas letras tiene local valora,rompe
+              local valora,rompe
+              MOV SI,0
+       valora:CALL INPUTCH
+              CMP AL,0DH ;Es enter
+              JE rompe
+              MOV buffer[SI],AL
+              INC SI
+              ADD longitud,1
+              JMP valora
+       rompe: MOV SI,0
+       ENDM
+
+       LLENACADENA MACRO bufer
+              MOV AH,3FH
+              MOV BX,0;EL CERO INDICA QUE LEEEMOS DESDE TECLADO
+              MOV CX,30
+              LEA DX,bufer
+              INT 21H
+       ENDM
+
+       BUSCARLETRA MACRO letra,arreglo,tope
+              local eva,imprime,salir
+              MOV SI,0
+        eva:  CMP SI,tope
+              JE  salir
+              MOV BL,arreglo[SI]
+              CMP BL,letra
+              JE  imprime
+              INC SI
+              JMP eva
+       imprime: 
+              
+              MOV tamn,SI
+              ADD tamn,32 
+              ;OUTPUTCH tamn           
+              MARCA tamn,2,2FH
+              INC SI
+              JMP eva
+       salir: 
+       ENDM
+
+       MARCA MACRO x,y,color
+              MOV AX,0600H
+              MOV BH,color
+              MOV CL,x
+              MOV CH,y
+              MOV DL,x
+              MOV DH,y
+              INT 10H 
+
+              OUTPUTCH 'H'
+       ENDM
+codigo ENDS 

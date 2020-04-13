@@ -1,0 +1,109 @@
+.MODEL SMALL
+include Libreria.lib;
+.STACK 64;
+.DATA
+    letop1 DB 'Escribe Nombre: ','$'
+    letop2 DB 'S','$'
+    letop3 DB 'Apariciones: ','$'
+    
+    let DB 'Escribe caracter: ','$'
+    v DB  30 DUP(?),'$'
+    tamn DB ?,'$'
+    x DB ?,'$'
+    y DB ?,'$'
+    num DB (0),'$'
+    tope DW 0,'$'
+    vocal DB ?,'$'
+    salto DB 0DH,0AH,'$'
+.CODE
+MAIN PROC FAR
+            MOV AX, @DATA
+            MOV DS,AX
+            CLEAR 0000,184FH
+            
+            WRITEXY letop1,3H,20H
+            CALL PEDIRNAME
+
+       menu:CLEAR 0000,184FH
+            CALL MUESTRAMENU
+            WRITEXY let,5H,20H
+            CALL INPUTCH
+            
+            CMP AL,'.'
+            JE fin
+            MOV vocal,AL
+            CALL COUNTVOCAL
+            JMP menu
+    fin:    MOV AH,04CH
+            INT 21H       
+
+
+MAIN ENDP
+        
+
+COUNTVOCAL PROC
+            GOTOXY 0BH,00H 
+            
+        eva:CMP SI,tope
+            JE fuera
+            MOV BL,v[SI]
+            CMP BL,vocal
+            JE imprime
+            INC SI
+            JMP eva
+   imprime: 
+            INC num
+            MOV tamn,SI
+            ADD tamn,48
+            
+            MARCA tamn,3,2FH
+            ;CALL MUESTRAMENU 
+            INC SI
+            JMP eva
+
+    fuera:
+            CALL MUESTRAMENU
+            WRITEXY letop3,9,20
+            ADD num,30H
+            OUTPUTCH num
+            MOV SI,0
+            MOV num,0
+            CALL INPUTCH
+            RET
+COUNTVOCAL ENDP
+
+MUESTRAMENU PROC
+            ;CLEAR 0000,184FH
+            WRITEXY letop1,3H,20H
+            ESCRIBE v
+            RET
+MUESTRAMENU ENDP
+
+
+PEDIRNAME PROC
+        ;CLEAR 0000,184FH
+        WRITEXY letop1,3H,20H
+        MOV SI,0
+valora: CALL INPUTCH
+        CMP AL,0DH ;Es enter
+        JE rompe
+        MOV v[SI],AL
+        INC SI
+        ADD tope,1
+        JMP valora
+rompe:  MOV SI,0
+        RET
+PEDIRNAME ENDP
+
+GETCOORXY PROC
+        MOV AX,CX
+        MOV BL,8
+        DIV BL
+        MOV x,AL;AQUI TOY Guardando x
+        MOV AX,DX
+        DIV BL
+        MOV y,AL ;AQUI TOY GUARDANDO y
+        RET
+GETCOORXY ENDP
+
+END MAIN
